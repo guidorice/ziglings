@@ -39,7 +39,7 @@ pub fn main() void {
         "Algol",
         "C",
         "OCaml",
-        "Zig",
+        "Moog",
         "Prolog",
     };
 
@@ -47,7 +47,7 @@ pub fn main() void {
     // return it from the for loop.
     const current_lang: ?[]const u8 = for (langs) |lang| {
         if (lang.len == 3) break lang;
-    };
+    } else "Zig";
 
     if (current_lang) |cl| {
         print("Current language: {s}\n", .{cl});
