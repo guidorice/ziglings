@@ -61,8 +61,8 @@ pub fn main() void {
     // values. Therefore, it follows that we just specify numeric
     // types with specific sizes. The comptime numbers will be
     // coerced (if they'll fit!) into your chosen runtime types.
-    var var_int = 12345;
-    var var_float = 987.654;
+    var var_int: u32 = 12345;
+    var var_float: f32 = 987.654;
 
     // We can change what is stored at the areas set aside for
     // "var_int" and "var_float" in the running compiled program.
