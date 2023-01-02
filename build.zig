@@ -8,7 +8,7 @@ const print = std.debug.print;
 // When changing this version, be sure to also update README.md in two places:
 //     1) Getting Started
 //     2) Version Changes
-const needed_version = std.SemanticVersion.parse("0.10.0-dev.1427") catch unreachable;
+const needed_version = std.SemanticVersion.parse("0.10.0-dev.3978") catch unreachable;
 
 const Exercise = struct {
     /// main_file must have the format key_name.zig.
@@ -26,6 +26,10 @@ const Exercise = struct {
     /// By default, we verify output against stderr.
     /// Set this to true to check stdout instead.
     check_stdout: bool = false,
+
+    /// This exercise makes use of the async feature.
+    /// We need to keep track of this, so we compile without the self hosted compiler
+    @"async": bool = false,
 
     /// Returns the name of the main file with .zig stripped.
     pub fn baseName(self: Exercise) []const u8 {
@@ -64,7 +68,7 @@ const exercises = [_]Exercise{
     },
     .{
         .main_file = "004_arrays.zig",
-        .output = "Fourth: 7, Length: 8",
+        .output = "First: 2, Fourth: 7, Length: 8",
         .hint = "There are two things to complete here.",
     },
     .{
@@ -240,7 +244,7 @@ const exercises = [_]Exercise{
     },
     .{
         .main_file = "043_pointers5.zig",
-        .output = "Wizard (G:10 H:100 XP:20)",
+        .output = "Wizard (G:10 H:100 XP:20)\n  Mentor: Wizard (G:10000 H:100 XP:2340)",
     },
     .{
         .main_file = "044_quiz5.zig",
@@ -331,7 +335,7 @@ const exercises = [_]Exercise{
     },
     .{
         .main_file = "064_builtins.zig",
-        .output = "1101 + 0101 = 0010 (true). Furthermore, 11110000 backwards is 00001111.",
+        .output = "1101 + 0101 = 0010 (true). Without overflow: 00010010. Furthermore, 11110000 backwards is 00001111.",
     },
     .{
         .main_file = "065_builtins2.zig",
@@ -418,34 +422,42 @@ const exercises = [_]Exercise{
         .main_file = "084_async.zig",
         .output = "foo() A",
         .hint = "Read the facts. Use the facts.",
+        .@"async" = true,
     },
     .{
         .main_file = "085_async2.zig",
         .output = "Hello async!",
+        .@"async" = true,
     },
     .{
         .main_file = "086_async3.zig",
         .output = "5 4 3 2 1",
+        .@"async" = true,
     },
     .{
         .main_file = "087_async4.zig",
         .output = "1 2 3 4 5",
+        .@"async" = true,
     },
     .{
         .main_file = "088_async5.zig",
         .output = "Example Title.",
+        .@"async" = true,
     },
     .{
         .main_file = "089_async6.zig",
         .output = ".com: Example Title, .org: Example Title.",
+        .@"async" = true,
     },
     .{
         .main_file = "090_async7.zig",
         .output = "beef? BEEF!",
+        .@"async" = true,
     },
     .{
         .main_file = "091_async8.zig",
         .output = "ABCDEF",
+        .@"async" = true,
     },
 };
 
@@ -698,6 +710,11 @@ const ZiglingStep = struct {
         zig_args.append(builder.zig_exe) catch unreachable;
         zig_args.append("build-exe") catch unreachable;
 
+        // Enable the stage 1 compiler if using the async feature
+        if (self.exercise.@"async") {
+            zig_args.append("-fstage1") catch unreachable;
+        }
+
         if (builder.color != .auto) {
             zig_args.append("--color") catch unreachable;
             zig_args.append(@tagName(builder.color)) catch unreachable;
@@ -737,7 +754,6 @@ const ZiglingStep = struct {
         const build_output_dir = std.mem.trimRight(u8, output_dir_nl, "\r\n");
 
         const target_info = std.zig.system.NativeTargetInfo.detect(
-            builder.allocator,
             .{},
         ) catch unreachable;
         const target = target_info.target;

@@ -116,7 +116,9 @@ fn printTuple(tuple: anytype) void {
         //         @field(foo, "x"); // returns the value at foo.x
         //
         // The first field should print as: "0"(bool):true
-        print("\"{s}\"({s}):{any} ", .{
+        print(
+            "\"{s}\"({}):{any} ",
+            .{
                 field.name,
                 field.field_type,
                 @field(tuple, field.name),

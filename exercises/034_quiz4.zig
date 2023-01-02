@@ -12,7 +12,7 @@ const NumError = error{IllegalNumber};
 pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
     const my_num = getNumber();
-    try stdout.print("my_num={}\n", .{my_num});
+    try stdout.print("my_num={!}\n", .{my_num});
 }
 
 // This function is obviously weird and non-functional. But you will not be changing it for this quiz.
